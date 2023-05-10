@@ -12,3 +12,4 @@ PROYECTO
  Funcionalidades básicas:
  -Los documentos solo se cargan 1 vez, con la primera búsqueda, por lo que es eficiente.
  -El ranking de relevancia es TF-IDF.
+ -Se añadirán otras funcionalides...
