@@ -1,0 +1,121 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/noel/Music/moogle-main/MoogleServer/MoogleServer.csproj": {}
+  },
+  "projects": {
+    "/home/noel/Music/moogle-main/MoogleEngine/MoogleEngine.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/noel/Music/moogle-main/MoogleEngine/MoogleEngine.csproj",
+        "projectName": "MoogleEngine",
+        "projectPath": "/home/noel/Music/moogle-main/MoogleEngine/MoogleEngine.csproj",
+        "packagesPath": "/home/noel/.nuget/packages/",
+        "outputPath": "/home/noel/Music/moogle-main/MoogleEngine/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/noel/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.203/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/noel/Music/moogle-main/MoogleServer/MoogleServer.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/noel/Music/moogle-main/MoogleServer/MoogleServer.csproj",
+        "projectName": "MoogleServer",
+        "projectPath": "/home/noel/Music/moogle-main/MoogleServer/MoogleServer.csproj",
+        "packagesPath": "/home/noel/.nuget/packages/",
+        "outputPath": "/home/noel/Music/moogle-main/MoogleServer/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/noel/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/home/noel/Music/moogle-main/MoogleEngine/MoogleEngine.csproj": {
+                "projectPath": "/home/noel/Music/moogle-main/MoogleEngine/MoogleEngine.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.203/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
