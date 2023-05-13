@@ -20,7 +20,8 @@ public static class Moogle
         {
         Cargar_d_TitleText();
         Cargar_d_TitlePalabraTf();                                
-        }      
+        }  
+        Inic_d_PalabraIdf();
         Cargar_d_PalabraIdf(palabrasDelQuery);
         Inicializar(items); 
         LLenarConTitleSnippetScore(items, palabrasDelQuery);
@@ -113,5 +114,9 @@ public static class Moogle
         {
             items[i] = new SearchItem(" ", " ", 0);
         }
+    }
+    public static void Inic_d_PalabraIdf()
+    {
+        d_PalabraIdf = new Dictionary<string, double>();
     }
 }
