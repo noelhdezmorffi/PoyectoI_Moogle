@@ -1,4 +1,4 @@
-﻿namespace MoogleEngine;
+namespace MoogleEngine;
 
 
 public static class Moogle
@@ -20,10 +20,10 @@ public static class Moogle
         {
         Cargar_d_TitleText();
         Cargar_d_TitlePalabraTf();                                
-        }  
-        Inic_d_PalabraIdf();
+        }     
+        Inicializar_d_PalabraIdf();   // hay que inicializarlo en cada búsqueda porque depende del query
         Cargar_d_PalabraIdf(palabrasDelQuery);
-        Inicializar(items); 
+        SearchItem.Inicializar(items, cantTxts);
         LLenarConTitleSnippetScore(items, palabrasDelQuery);
         OrdenaPorScore(items);
         busquedasHechas++;
@@ -65,7 +65,7 @@ public static class Moogle
             }
         }
     }
-    public static void Cargar_d_TitlePalabraTf()    // optimizar pasando como parametro palabras del query
+    public static void Cargar_d_TitlePalabraTf()    
     {
         foreach (KeyValuePair<string, string> titleText in d_TitleText)
         {
@@ -73,7 +73,7 @@ public static class Moogle
             Dictionary<string, int> d_PalabraTf = new Dictionary<string, int>();
             char[] separadores = { ' ', '.', ',', ';', ':', '{', '}', '[', ']', '"', '$', '!', '¡', '¿', '?', '#', '%', '&', '/', '(', ')', '=', '-', '_', '@' };
             string[] palabrasDelText = d_TitleText[titulo].ToLower().Split(separadores, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string palabra in palabrasDelText)  // optimizar foreach(string palabra in palabrasDelQuery) verificar q esta en palabrasDelText
+            foreach (string palabra in palabrasDelText)  
             {
                 if (d_PalabraTf.ContainsKey(palabra)) d_PalabraTf[palabra]++;
                 else d_PalabraTf.Add(palabra, 1);
@@ -86,7 +86,10 @@ public static class Moogle
         foreach (string palabra in palabras)
         {
             double idf = Math.Log((cantTxts + 1 / (CantTxtsConPalabraX(palabra) + 1)), 2);
-            d_PalabraIdf.Add(palabra, idf);
+            if (!d_PalabraIdf.ContainsKey(palabra))
+            {
+                d_PalabraIdf.Add(palabra, idf);
+            }
         }
     }
     public static void LLenarConTitleSnippetScore(SearchItem[] items, string[] palabras)
@@ -102,20 +105,13 @@ public static class Moogle
                     {                       //          tf                                  *     idf   
                         items[i].Score += d_TitlePalabraTf[titlePalabraTf.Key][palabras[j]] * d_PalabraIdf[palabras[j]];
                     }
-                }
+                }                
                 items[i].Snippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(120, d_TitleText[titlePalabraTf.Key].Length));//mejorable con la palabra de mayor idf del query
                 i++;
             }
         }
     }
-    public static void Inicializar(SearchItem[] items)
-    {
-        for (int i = 0; i < cantTxts; i++)
-        {
-            items[i] = new SearchItem(" ", " ", 0);
-        }
-    }
-    public static void Inic_d_PalabraIdf()
+    public static void Inicializar_d_PalabraIdf()
     {
         d_PalabraIdf = new Dictionary<string, double>();
     }
