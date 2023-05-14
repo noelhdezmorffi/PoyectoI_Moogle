@@ -9,6 +9,13 @@ public class SearchItem
         this.Score = score;
     }
 
+    public static void Inicializar(SearchItem[] items,int n)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            items[i] = new SearchItem(" ", " ", 0);
+        }
+    }
     public string Title { get; set; }
 
     public string Snippet { get; set; }
@@ -16,4 +23,5 @@ public class SearchItem
     public double Score { get; set; }
 
     public bool docValido = false; // para funcionalidades opcionales
+
 }
