@@ -16,11 +16,11 @@ public class SearchItem
             items[i] = new SearchItem(" ", " ", 0);
         }
     }
-    public string Title { get; set; }
+    public string Title { get; private set; }
 
-    public string Snippet { get; set; }
+    public string Snippet { get; private set; }
 
-    public double Score { get; set; }
+    public double Score { get; private set; }
 
     public bool docValido = false; // para funcionalidades opcionales
 
