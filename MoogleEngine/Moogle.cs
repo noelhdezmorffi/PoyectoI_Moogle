@@ -3,7 +3,8 @@ namespace MoogleEngine;
 
 public static class Moogle
 {
-    static string[] filePaths = Directory.GetFiles("/home/noel/Documents/moogle-main/Content", "*.txt"); // direccion de los archivos *.txt
+    static string ContentPath = "/home/noel/Documents/moogle-main/Content";
+    static string[] filePaths = Directory.GetFiles(ContentPath, "*.txt"); // direccion de los archivos *.txt
     static int busquedasHechas = 0;
     static int cantTxts = filePaths.Length;
     static Dictionary<string, Dictionary<string, int>> d_TitlePalabraTf = new Dictionary<string, Dictionary<string, int>>(); // Key: titulo del doc, Value: dictionary (donde Key: palabra del query, Value: tf)
@@ -21,7 +22,7 @@ public static class Moogle
         Cargar_d_TitleText();
         Cargar_d_TitlePalabraTf();                                
         }     
-        Inicializar_d_PalabraIdf();   // hay que inicializarlo en cada búsqueda porque depende del query
+        Inicializar_d_PalabraIdf();   // hay que inicializarlo(renovarlo) en cada búsqueda porque depende del nuevo query
         Cargar_d_PalabraIdf(palabrasDelQuery);
         SearchItem.Inicializar(items, cantTxts);
         LLenarConTitleSnippetScore(items, palabrasDelQuery);
@@ -71,7 +72,7 @@ public static class Moogle
         {
             string titulo = titleText.Key;
             Dictionary<string, int> d_PalabraTf = new Dictionary<string, int>();
-            char[] separadores = { ' ', '.', ',', ';', ':', '{', '}', '[', ']', '"', '$', '!', '¡', '¿', '?', '#', '%', '&', '/', '(', ')', '=', '-', '_', '@' };
+            char[] separadores = { ' ', '.', ',', ';', ':', '{', '}', '[', ']', '"', '$', '!', '¡', '¿', '?', '%', '&', '/', '(', ')', '=', '-', '_', '@' };
             string[] palabrasDelText = d_TitleText[titulo].ToLower().Split(separadores, StringSplitOptions.RemoveEmptyEntries);
             foreach (string palabra in palabrasDelText)  
             {
@@ -97,16 +98,18 @@ public static class Moogle
         int i = 0;
         {
             foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
-            {
-                items[i].Title = titlePalabraTf.Key;
+            {                
+                string itemTitle = titlePalabraTf.Key;
+                string itemSnippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(120, d_TitleText[titlePalabraTf.Key].Length));//mejorable con la palabra de mayor idf del query
+                double itemScore = 0;
                 for (int j = 0; j < palabras.Length; j++)
                 {                             // si el texto contiene la palabra
                     if (d_TitlePalabraTf[titlePalabraTf.Key].ContainsKey(palabras[j]))
                     {                       //          tf                                  *     idf   
-                        items[i].Score += d_TitlePalabraTf[titlePalabraTf.Key][palabras[j]] * d_PalabraIdf[palabras[j]];
+                        itemScore += d_TitlePalabraTf[titlePalabraTf.Key][palabras[j]] * d_PalabraIdf[palabras[j]];
                     }
-                }                
-                items[i].Snippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(120, d_TitleText[titlePalabraTf.Key].Length));//mejorable con la palabra de mayor idf del query
+                }
+                items[i] = new SearchItem(itemTitle, itemSnippet, itemScore);
                 i++;
             }
         }
