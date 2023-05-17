@@ -12,4 +12,7 @@ PROYECTO
  Funcionalidades básicas:
  -El ranking de relevancia es TF-IDF.
  -Los documentos solo se cargan 1 vez, con la primera búsqueda, por lo que es eficiente.
+ -Las consultas tienen operadores de aparición:
+   -> Un símbolo `!` delante de una palabra indica que esa palabra no debe aparecer en ningún documento que sea devuelto.
+   -> Un símbolo `^` delante de una palabra indica que esa palabra sí debe aparecer en cualquier documento que sea devuelto.
  -Se añadirán otras funcionalides...
