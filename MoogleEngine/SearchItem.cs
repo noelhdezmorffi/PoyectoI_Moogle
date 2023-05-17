@@ -22,6 +22,6 @@ public class SearchItem
 
     public double Score { get; private set; }
 
-    public bool docValido = false; // para funcionalidades opcionales
+    public bool docValido = true; // para funcionalidades opcionales
 
 }
