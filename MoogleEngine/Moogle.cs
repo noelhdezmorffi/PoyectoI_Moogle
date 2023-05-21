@@ -16,7 +16,7 @@ public static class Moogle
         string[] palabrasDelQuery = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
         bool[] palabrasNoDebenAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra i del query no debe aparecer
         bool[] palabrasSiDebenAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra i del query debe aparecer
-        OperadoresAparicion(palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer); 
+        OperadoresAparicion(palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer); // da valores correctos a los 3 arrays anteriores 
 
         SearchItem[] items = new SearchItem[cantTxts];  
         SearchResult.Inicializar(items, cantTxts); // se inicializa cada item de items, así no son null  
@@ -125,19 +125,19 @@ public static class Moogle
         d_PalabraIdf = new Dictionary<string, double>();
     }
 
-    private static void OperadoresAparicion(string[] palabras, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer) // 
+    private static void OperadoresAparicion(string[] palabrasDelQuery, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer) 
     {
-        for (int i = 0; i < palabras.Length; i++)
+        for (int i = 0; i < palabrasDelQuery.Length; i++)
         {
-            if(palabras[i][0] == '!') 
+            if(palabrasDelQuery[i][0] == '!') 
             {
                 palabraNoDebeAparecer[i] = true;
-                palabras[i] = palabras[i].Substring(1);
+                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter de aparición '!' de esa palabra del query
             }
-            if(palabras[i][0] == '^') 
+            if(palabrasDelQuery[i][0] == '^') 
             {
                 palabraSiDebeAparecer[i] = true;
-                palabras[i] = palabras[i].Substring(1);
+                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter de aparición '^' de esa palabra del query
             }
         }
     }
