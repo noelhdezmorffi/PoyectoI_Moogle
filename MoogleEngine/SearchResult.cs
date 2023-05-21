@@ -22,17 +22,17 @@ public class SearchResult
         }
     }
 
-    public static void OrdenaPorScore(SearchItem[] items)
+    public void OrdenaPorScore()
     {
-        for (int k = 1; k < items.Length; k++)
+        for (int k = 1; k < this.items.Length; k++)
         {
-            for (int i = 0; i < items.Length - 1; i++)
+            for (int i = 0; i < this.items.Length - 1; i++)
             {
-                SearchItem temp = items[i];
-                if (items[i].Score < items[i + 1].Score)
+                SearchItem temp = this.items[i];
+                if (this.items[i].Score < this.items[i + 1].Score)
                 {
-                    items[i] = items[i + 1];
-                    items[i + 1] = temp;
+                    this.items[i] = this.items[i + 1];
+                    this.items[i + 1] = temp;
                 }
             }
         }
