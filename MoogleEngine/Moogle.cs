@@ -32,11 +32,11 @@ public static class Moogle
         
         LLenarConTitleSnippetScore(items, palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
 
-        SearchResult.OrdenaPorScore(items);
-
         primeraBusqueda = false;
 
-        return new SearchResult(items, query);       
+        SearchResult result = new SearchResult(items, query);       
+        result.OrdenaPorScore();
+        return result;
     }
 
     private static int CantTxtsConPalabraX(string palabraX)
@@ -44,7 +44,7 @@ public static class Moogle
         int contador = 0;
         foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
         {
-            if (d_TitlePalabraTf[titlePalabraTf.Key].ContainsKey(palabraX)) contador++;
+            if (titlePalabraTf.Value.ContainsKey(palabraX)) contador++;
         }
         return contador;
     }
@@ -53,7 +53,8 @@ public static class Moogle
     {
         foreach (string filepath in filePaths)
         {
-            string titulo = Path.GetFileName(filepath);
+            string tituloBad = Path.GetFileName(filepath);
+            string titulo = tituloBad.Substring(0, tituloBad.Length-4); // se elimina el ".txt" 
             string texto = File.ReadAllText(filepath);
             if(!d_TitleText.ContainsKey(titulo))
             {
@@ -66,16 +67,15 @@ public static class Moogle
     {
         foreach (KeyValuePair<string, string> titleText in d_TitleText)
         {
-            string titulo = titleText.Key;
             Dictionary<string, int> d_PalabraTf = new Dictionary<string, int>();
             char[] separadores = { ' ', '.', ',', ';', ':', '{', '}', '[', ']', '"', '$', '!', '¡', '¿', '?', '%', '&', '/', '(', ')', '=', '-', '_', '@' };
-            string[] palabrasDelText = d_TitleText[titulo].ToLower().Split(separadores, StringSplitOptions.RemoveEmptyEntries);
+            string[] palabrasDelText = titleText.Value.ToLower().Split(separadores, StringSplitOptions.RemoveEmptyEntries);
             foreach (string palabra in palabrasDelText)  
             {
                 if (d_PalabraTf.ContainsKey(palabra)) d_PalabraTf[palabra]++;
                 else d_PalabraTf.Add(palabra, 1);
             }
-            d_TitlePalabraTf.Add(titulo, d_PalabraTf);
+            d_TitlePalabraTf.Add(titleText.Key, d_PalabraTf);
         }
     }
 
@@ -102,19 +102,20 @@ public static class Moogle
                 double itemScore = 0;
                 
                 for (int j = 0; j < palabras.Length; j++)
-                {                             // si el texto contiene la palabra
-                    if (d_TitlePalabraTf[titlePalabraTf.Key].ContainsKey(palabras[j]))
-                    {       // itemScore +=        tf                                  *          idf   
-                        itemScore += d_TitlePalabraTf[titlePalabraTf.Key][palabras[j]] * d_PalabraIdf[palabras[j]];
-                        if(palabrasNoDebenAparecer[j]) items[i].docValido = false;
+                {                             // si el texto contiene la palabra j
+                    if (titlePalabraTf.Value.ContainsKey(palabras[j]))
+                    {// itemScore +=             tf                    *          idf   
+                        itemScore += titlePalabraTf.Value[palabras[j]] * d_PalabraIdf[palabras[j]];
+                     // si la palabra j no debe aparecer(pero sí aparece por el if más externo), entonces el doc. no es válido
+                        if(palabrasNoDebenAparecer[j]) items[i].docValido = false; 
                     }
-                    else  // si el texto no contiene la palabra
-                    {
+                    else  // si el texto no contiene la palabra j,
+                    {     // pero sí debe aparecer, entonces el doc. no es válido
                         if(palabrasSiDebenAparecer[j]) items[i].docValido = false;
                     }
                 }
                 if(items[i].docValido)    items[i] = new SearchItem(itemTitle, itemSnippet, itemScore);
-                else/*si no es valido*/   items[i] = new SearchItem(" ", " ", -1);              
+                else/*si no es válido*/   items[i] = new SearchItem(" ", " ", -1);              
                 i++;                
             }
         }
@@ -132,12 +133,12 @@ public static class Moogle
             if(palabrasDelQuery[i][0] == '!') 
             {
                 palabraNoDebeAparecer[i] = true;
-                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter de aparición '!' de esa palabra del query
+                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter '!' de esa palabra del query
             }
             if(palabrasDelQuery[i][0] == '^') 
             {
                 palabraSiDebeAparecer[i] = true;
-                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter de aparición '^' de esa palabra del query
+                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter '^' de esa palabra del query
             }
         }
     }
