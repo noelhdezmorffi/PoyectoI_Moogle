@@ -3,51 +3,43 @@ namespace MoogleEngine;
 
 public static class Moogle
 {
-    static string ContentPath = "/home/noel/Documents/moogle-main/Content";
-    static string[] filePaths = Directory.GetFiles(ContentPath, "*.txt"); // direccion de los archivos *.txt
-    static int busquedasHechas = 0;
-    static int cantTxts = filePaths.Length;
-    static Dictionary<string, Dictionary<string, int>> d_TitlePalabraTf = new Dictionary<string, Dictionary<string, int>>(); // Key: titulo del doc, Value: dictionary (donde Key: palabra del query, Value: tf)
-    static Dictionary<string, double> d_PalabraIdf = new Dictionary<string, double>(); // Key: palabra del query, Value: idf
-    static Dictionary<string, string> d_TitleText = new Dictionary<string, string>();  // Key: titulo, Value: todo el texto (para dar el item.Title y item.Snippet)
-
+    private static string ContentPath = "/home/noel/Documents/moogle-main/Content";
+    private static string[] filePaths = Directory.GetFiles(ContentPath, "*.txt"); // direccion de los archivos *.txt
+    private static bool primeraBusqueda = true;
+    private static int cantTxts = filePaths.Length;
+    private static Dictionary<string, Dictionary<string, int>> d_TitlePalabraTf = new Dictionary<string, Dictionary<string, int>>(); // Key: titulo del doc, Value: dictionary (donde Key: palabra del query, Value: tf)
+    private static Dictionary<string, double> d_PalabraIdf = new Dictionary<string, double>(); // Key: palabra del query, Value: idf
+    private static Dictionary<string, string> d_TitleText = new Dictionary<string, string>();  // Key: titulo, Value: todo el texto (para dar el item.Title y item.Snippet)
 
     public static SearchResult Query(string query)
     {        
         string[] palabrasDelQuery = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        bool[] palabraNoDebeAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra no debe aparecer
-        bool[] palabraSiDebeAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra debe aparecer
-        OperadoresAparicion(palabrasDelQuery, palabraNoDebeAparecer, palabraSiDebeAparecer); 
-        SearchItem[] items = new SearchItem[cantTxts];        
-        if(busquedasHechas == 0)
+        bool[] palabrasNoDebenAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra i del query no debe aparecer
+        bool[] palabrasSiDebenAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra i del query debe aparecer
+        OperadoresAparicion(palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer); 
+
+        SearchItem[] items = new SearchItem[cantTxts];  
+        SearchResult.Inicializar(items, cantTxts); // se inicializa cada item de items, así no son null  
+
+        if(primeraBusqueda)
         {
-        Cargar_d_TitleText();
-        Cargar_d_TitlePalabraTf();                                
-        }     
-        Inicializar_d_PalabraIdf();   // hay que inicializarlo(renovarlo) en cada búsqueda porque depende del nuevo query
+            Cargar_d_TitleText();
+            Cargar_d_TitlePalabraTf();
+        }
+
+        Inicializar_d_PalabraIdf();   // hay que inicializar(renovar) d_PalabraIdf en cada búsqueda, porque depende del nuevo query
         Cargar_d_PalabraIdf(palabrasDelQuery);
-        SearchItem.Inicializar(items, cantTxts);
-        LLenarConTitleSnippetScore(items, palabrasDelQuery, palabraNoDebeAparecer, palabraSiDebeAparecer);
-        OrdenaPorScore(items);
-        busquedasHechas++;
+        
+        LLenarConTitleSnippetScore(items, palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
+
+        SearchResult.OrdenaPorScore(items);
+
+        primeraBusqueda = false;
+
         return new SearchResult(items, query);       
     }
-    public static void OrdenaPorScore(SearchItem[] items)
-    {
-        for (int k = 1; k < items.Length; k++)
-        {
-            for (int i = 0; i < items.Length - 1; i++)
-            {
-                SearchItem temp = items[i];
-                if (items[i].Score < items[i + 1].Score)
-                {
-                    items[i] = items[i + 1];
-                    items[i + 1] = temp;
-                }
-            }
-        }
-    }
-    public static int CantTxtsConPalabraX(string palabraX)
+
+    private static int CantTxtsConPalabraX(string palabraX)
     {
         int contador = 0;
         foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
@@ -56,7 +48,8 @@ public static class Moogle
         }
         return contador;
     }
-    public static void Cargar_d_TitleText()
+
+    private static void Cargar_d_TitleText()
     {
         foreach (string filepath in filePaths)
         {
@@ -64,11 +57,12 @@ public static class Moogle
             string texto = File.ReadAllText(filepath);
             if(!d_TitleText.ContainsKey(titulo))
             {
-            d_TitleText.Add(titulo, texto);
+                d_TitleText.Add(titulo, texto);
             }
         }
     }
-    public static void Cargar_d_TitlePalabraTf()    
+
+    private static void Cargar_d_TitlePalabraTf()    
     {
         foreach (KeyValuePair<string, string> titleText in d_TitleText)
         {
@@ -84,7 +78,8 @@ public static class Moogle
             d_TitlePalabraTf.Add(titulo, d_PalabraTf);
         }
     }
-    public static void Cargar_d_PalabraIdf(string[] palabras)
+
+    private static void Cargar_d_PalabraIdf(string[] palabras)
     {
         foreach (string palabra in palabras)
         {
@@ -95,38 +90,42 @@ public static class Moogle
             }
         }
     }
-    public static void LLenarConTitleSnippetScore(SearchItem[] items, string[] palabras, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer)
+
+    private static void LLenarConTitleSnippetScore(SearchItem[] items, string[] palabras, bool[] palabrasNoDebenAparecer, bool[] palabrasSiDebenAparecer)
     {
         int i = 0;
         {
             foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
             {                
                 string itemTitle = titlePalabraTf.Key;
-                string itemSnippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(120, d_TitleText[titlePalabraTf.Key].Length));//mejorable con la palabra de mayor idf del query
+                string itemSnippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(350, d_TitleText[titlePalabraTf.Key].Length));//mejorable cambiando 0 por la palabra de mayor idf del query
                 double itemScore = 0;
+                
                 for (int j = 0; j < palabras.Length; j++)
                 {                             // si el texto contiene la palabra
                     if (d_TitlePalabraTf[titlePalabraTf.Key].ContainsKey(palabras[j]))
-                    {        //   score =          tf                                  *          idf   
+                    {       // itemScore +=        tf                                  *          idf   
                         itemScore += d_TitlePalabraTf[titlePalabraTf.Key][palabras[j]] * d_PalabraIdf[palabras[j]];
-                        if(palabraNoDebeAparecer[j]) items[i].docValido = false;
+                        if(palabrasNoDebenAparecer[j]) items[i].docValido = false;
                     }
                     else  // si el texto no contiene la palabra
                     {
-                        if(palabraSiDebeAparecer[j]) items[i].docValido = false;
+                        if(palabrasSiDebenAparecer[j]) items[i].docValido = false;
                     }
                 }
                 if(items[i].docValido)    items[i] = new SearchItem(itemTitle, itemSnippet, itemScore);
-                else /*si no es valido*/  items[i] = new SearchItem(" ", " ", -1);              
+                else/*si no es valido*/   items[i] = new SearchItem(" ", " ", -1);              
                 i++;                
             }
         }
     }
-    public static void Inicializar_d_PalabraIdf()
+
+    private static void Inicializar_d_PalabraIdf()
     {
         d_PalabraIdf = new Dictionary<string, double>();
     }
-    public static void OperadoresAparicion(string[] palabras, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer)
+
+    private static void OperadoresAparicion(string[] palabras, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer) // 
     {
         for (int i = 0; i < palabras.Length; i++)
         {
