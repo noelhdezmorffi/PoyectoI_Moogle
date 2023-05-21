@@ -3,13 +3,13 @@ namespace MoogleEngine;
 
 public static class Moogle
 {
-    private static string ContentPath = "/home/noel/Documents/moogle-main/Content";
-    private static string[] filePaths = Directory.GetFiles(ContentPath, "*.txt"); // direccion de los archivos *.txt
-    private static bool primeraBusqueda = true;
+    private static string contentPath = "/home/noel/Documents/moogle-main/Content";
+    private static string[] filePaths = Directory.GetFiles(contentPath, "*.txt"); // direccion de cada archivo *.txt
     private static int cantTxts = filePaths.Length;
+    private static bool primeraBusqueda = true;
+    private static Dictionary<string, string> d_TitleText = new Dictionary<string, string>();  // Key: titulo, Value: todo el texto 
     private static Dictionary<string, Dictionary<string, int>> d_TitlePalabraTf = new Dictionary<string, Dictionary<string, int>>(); // Key: titulo del doc, Value: dictionary (donde Key: palabra del query, Value: tf)
     private static Dictionary<string, double> d_PalabraIdf = new Dictionary<string, double>(); // Key: palabra del query, Value: idf
-    private static Dictionary<string, string> d_TitleText = new Dictionary<string, string>();  // Key: titulo, Value: todo el texto (para dar el item.Title y item.Snippet)
 
     public static SearchResult Query(string query)
     {        
@@ -19,15 +19,14 @@ public static class Moogle
         OperadoresAparicion(palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer); // da valores correctos a los 3 arrays anteriores 
 
         SearchItem[] items = new SearchItem[cantTxts];  
-        SearchResult.Inicializar(items, cantTxts); // se inicializa cada item de items, así no son null  
+        SearchResult.Inicializar(items); // se inicializa cada item de items, así no son null  
 
         if(primeraBusqueda)
         {
             Cargar_d_TitleText();
             Cargar_d_TitlePalabraTf();
-        }
-
-        Inicializar_d_PalabraIdf();   // hay que inicializar(renovar) d_PalabraIdf en cada búsqueda, porque depende del nuevo query
+        }        
+      
         Cargar_d_PalabraIdf(palabrasDelQuery);
         
         LLenarConTitleSnippetScore(items, palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
@@ -54,7 +53,7 @@ public static class Moogle
         foreach (string filepath in filePaths)
         {
             string tituloBad = Path.GetFileName(filepath);
-            string titulo = tituloBad.Substring(0, tituloBad.Length-4); // se elimina el ".txt" 
+            string titulo = tituloBad.Substring(0, tituloBad.Length-4); // se elimina el pedazo de string ".txt" 
             string texto = File.ReadAllText(filepath);
             if(!d_TitleText.ContainsKey(titulo))
             {
@@ -82,10 +81,10 @@ public static class Moogle
     private static void Cargar_d_PalabraIdf(string[] palabras)
     {
         foreach (string palabra in palabras)
-        {
-            double idf = Math.Log((cantTxts + 1 / (CantTxtsConPalabraX(palabra) + 1)), 2);
+        {            
             if (!d_PalabraIdf.ContainsKey(palabra))
             {
+                double idf = Math.Log((cantTxts + 1 / (CantTxtsConPalabraX(palabra) + 1)), 2);
                 d_PalabraIdf.Add(palabra, idf);
             }
         }
@@ -98,7 +97,7 @@ public static class Moogle
             foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
             {                
                 string itemTitle = titlePalabraTf.Key;
-                string itemSnippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(350, d_TitleText[titlePalabraTf.Key].Length));//mejorable cambiando 0 por la palabra de mayor idf del query
+                string itemSnippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(350, d_TitleText[titlePalabraTf.Key].Length));
                 double itemScore = 0;
                 
                 for (int j = 0; j < palabras.Length; j++)
@@ -120,12 +119,6 @@ public static class Moogle
             }
         }
     }
-
-    private static void Inicializar_d_PalabraIdf()
-    {
-        d_PalabraIdf = new Dictionary<string, double>();
-    }
-
     private static void OperadoresAparicion(string[] palabrasDelQuery, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer) 
     {
         for (int i = 0; i < palabrasDelQuery.Length; i++)
