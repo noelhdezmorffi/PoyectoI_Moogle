@@ -9,19 +9,12 @@ public class SearchItem
         this.Score = score;
     }
 
-    public static void Inicializar(SearchItem[] items,int n)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            items[i] = new SearchItem(" ", " ", 0);
-        }
-    }
     public string Title { get; private set; }
 
     public string Snippet { get; private set; }
 
     public double Score { get; private set; }
 
-    public bool docValido = true; // para funcionalidades opcionales
+    public bool docValido = true; // documento es valido?, para funcionalidades opcionales
 
 }
