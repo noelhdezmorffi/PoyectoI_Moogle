@@ -18,7 +18,7 @@ public class SearchResult
     {
         for (int i = 0; i < n; i++)
         {
-            items[i] = new SearchItem(" ", " ", 0);
+            items[i] = new SearchItem("", "", 0);
         }
     }
 
