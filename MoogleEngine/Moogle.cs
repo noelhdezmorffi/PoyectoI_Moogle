@@ -13,10 +13,10 @@ public static class Moogle
 
     public static SearchResult Query(string query)
     {        
-        string[] palabrasDelQuery = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        bool[] palabrasNoDebenAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra i del query no debe aparecer
-        bool[] palabrasSiDebenAparecer = new bool[palabrasDelQuery.Length];  // en la posicion i, es true si la palabra i del query debe aparecer
-        OperadoresAparicion(palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer); // da valores correctos a los 3 arrays anteriores 
+        string[] palabrasQuery = query.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        bool[] palabrasNoDebenAparecer = new bool[palabrasQuery.Length];  // en la posicion i, es true si la palabra i del query no debe aparecer
+        bool[] palabrasSiDebenAparecer = new bool[palabrasQuery.Length];  // en la posicion i, es true si la palabra i del query debe aparecer
+        OperadoresAparicion(palabrasQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer); // da valores correctos a los 3 arrays anteriores 
 
         SearchItem[] items = new SearchItem[cantTxts];  
         SearchResult.Inicializar(items); // se inicializa cada item de items, así no son null  
@@ -27,14 +27,14 @@ public static class Moogle
             Cargar_d_TitlePalabraTf();
         }        
       
-        Cargar_d_PalabraIdf(palabrasDelQuery);
+        Cargar_d_PalabraIdf(palabrasQuery);
         
-        LLenarConTitleSnippetScore(items, palabrasDelQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
-
-        primeraBusqueda = false;
+        AsignarTitleSnippetScore(items, palabrasQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
 
         SearchResult result = new SearchResult(items, query);       
-        result.OrdenaPorScore();
+        result.OrdenaPorScore();   
+             
+        primeraBusqueda = false;
         return result;
     }
 
@@ -90,48 +90,55 @@ public static class Moogle
         }
     }
 
-    private static void LLenarConTitleSnippetScore(SearchItem[] items, string[] palabras, bool[] palabrasNoDebenAparecer, bool[] palabrasSiDebenAparecer)
+    private static void AsignarTitleSnippetScore(SearchItem[] items, string[] palabrasQuery, bool[] palabrasNoDebenAparecer, bool[] palabrasSiDebenAparecer)
     {
         int i = 0;
         {
             foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
             {                
                 string itemTitle = titlePalabraTf.Key;
-                string itemSnippet = d_TitleText[titlePalabraTf.Key].Substring(0, Math.Min(350, d_TitleText[titlePalabraTf.Key].Length));
-                double itemScore = 0;
+                string itemSnippet = d_TitleText[itemTitle].Substring(0, Math.Min(350, d_TitleText[itemTitle].Length));
+                double itemScore = ScoreAndValidez(items, i, titlePalabraTf, palabrasQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
                 
-                for (int j = 0; j < palabras.Length; j++)
-                {                             // si el texto contiene la palabra j
-                    if (titlePalabraTf.Value.ContainsKey(palabras[j]))
-                    {// itemScore +=             tf                    *          idf   
-                        itemScore += titlePalabraTf.Value[palabras[j]] * d_PalabraIdf[palabras[j]];
-                     // si la palabra j no debe aparecer(pero sí aparece por el if más externo), entonces el doc. no es válido
-                        if(palabrasNoDebenAparecer[j]) items[i].docValido = false; 
-                    }
-                    else  // si el texto no contiene la palabra j,
-                    {     // pero sí debe aparecer, entonces el doc. no es válido
-                        if(palabrasSiDebenAparecer[j]) items[i].docValido = false;
-                    }
-                }
                 if(items[i].docValido)    items[i] = new SearchItem(itemTitle, itemSnippet, itemScore);
-                else/*si no es válido*/   items[i] = new SearchItem(" ", " ", -1);              
+                else/*si no es válido*/   items[i] = new SearchItem("", "", -1);              
                 i++;                
             }
         }
     }
-    private static void OperadoresAparicion(string[] palabrasDelQuery, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer) 
+
+    private static double ScoreAndValidez(SearchItem[] items, int i, KeyValuePair<string, Dictionary<string, int>> titlePalabraTf, string[] palabrasQuery, bool[] palabrasNoDebenAparecer, bool[] palabrasSiDebenAparecer)
     {
-        for (int i = 0; i < palabrasDelQuery.Length; i++)
+        double itemScore = 0;
+         for (int j = 0; j < palabrasQuery.Length; j++)
+                {  
+                    //si el doc. contiene la palabra j
+                    if (titlePalabraTf.Value.ContainsKey(palabrasQuery[j]))
+                    { //itemScore +=             tf                         *          idf   
+                        itemScore += titlePalabraTf.Value[palabrasQuery[j]] * d_PalabraIdf[palabrasQuery[j]];
+                      //si la palabra j no debe aparecer(pero sí aparece por el if más externo), entonces el doc. no es válido
+                        if(palabrasNoDebenAparecer[j]) items[i].docValido = false; 
+                    }
+                    else  //si el doc. no contiene la palabra j,
+                    {     //pero sí debe aparecer, entonces el doc. no es válido
+                        if(palabrasSiDebenAparecer[j]) items[i].docValido = false;
+                    }
+                }
+        return itemScore;
+    } 
+    private static void OperadoresAparicion(string[] palabrasQuery, bool[] palabraNoDebeAparecer, bool[] palabraSiDebeAparecer) 
+    {
+        for (int i = 0; i < palabrasQuery.Length; i++)
         {
-            if(palabrasDelQuery[i][0] == '!') 
+            if(palabrasQuery[i][0] == '!') 
             {
                 palabraNoDebeAparecer[i] = true;
-                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter '!' de esa palabra del query
+                palabrasQuery[i] = palabrasQuery[i].Substring(1); //elimina caracter '!' de esa palabra del query
             }
-            if(palabrasDelQuery[i][0] == '^') 
+            if(palabrasQuery[i][0] == '^') 
             {
                 palabraSiDebeAparecer[i] = true;
-                palabrasDelQuery[i] = palabrasDelQuery[i].Substring(1); //elimina caracter '^' de esa palabra del query
+                palabrasQuery[i] = palabrasQuery[i].Substring(1); //elimina caracter '^' de esa palabra del query
             }
         }
     }
