@@ -97,7 +97,7 @@ public static class Moogle
             foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
             {                
                 string itemTitle = titlePalabraTf.Key;
-                string itemSnippet = d_TitleText[itemTitle].Substring(0, Math.Min(350, d_TitleText[itemTitle].Length));
+                string itemSnippet = d_TitleText[itemTitle].Substring(d_TitleText[itemTitle].Length / 2, Math.Min(350, d_TitleText[itemTitle].Length));
                 double itemScore = ScoreAndValidez(items, i, titlePalabraTf, palabrasQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
                 
                 if(items[i].docValido)    items[i] = new SearchItem(itemTitle, itemSnippet, itemScore);
