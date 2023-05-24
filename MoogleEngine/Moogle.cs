@@ -84,7 +84,7 @@ public static class Moogle
         {            
             if (!d_PalabraIdf.ContainsKey(palabra))
             {
-                double idf = Math.Log((cantTxts + 1 / (CantTxtsConPalabraX(palabra) + 1)), 2);
+                double idf = Math.Log(((cantTxts + 1) / (CantTxtsConPalabraX(palabra) + 1)), 2);
                 d_PalabraIdf.Add(palabra, idf);
             }
         }
