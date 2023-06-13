@@ -84,7 +84,7 @@ public static class Moogle
         {            
             if (!d_PalabraIdf.ContainsKey(palabra))
             {
-                double idf = Math.Log(((cantTxts + 1) / (CantTxtsConPalabraX(palabra) + 1)), 2);
+                double idf = Math.Log((cantTxts + 1) / (CantTxtsConPalabraX(palabra) + 1), 2);
                 d_PalabraIdf.Add(palabra, idf);
             }
         }
@@ -96,11 +96,12 @@ public static class Moogle
         {
             foreach (KeyValuePair<string, Dictionary<string, int>> titlePalabraTf in d_TitlePalabraTf)
             {                
-                string itemTitle = titlePalabraTf.Key;
-                string itemSnippet = d_TitleText[itemTitle].Substring(d_TitleText[itemTitle].Length / 2, Math.Min(350, d_TitleText[itemTitle].Length));
                 double itemScore = ScoreAndValidez(items, i, titlePalabraTf, palabrasQuery, palabrasNoDebenAparecer, palabrasSiDebenAparecer);
+                string itemTitle = titlePalabraTf.Key;
+                string itemSnippet = d_TitleText[itemTitle].Substring(d_TitleText[itemTitle].Length / 2 , Math.Min(350, d_TitleText[itemTitle].Length));
                 
-                if(items[i].docValido)    items[i] = new SearchItem(itemTitle, itemSnippet, itemScore);
+                
+                if(items[i].docValido)    items[i] = new SearchItem(itemTitle + ".   score:" + itemScore, itemSnippet, itemScore);
                 else/*si no es válido*/   items[i] = new SearchItem("", "", -1);              
                 i++;                
             }
@@ -114,14 +115,22 @@ public static class Moogle
                 {  
                     //si el doc. contiene la palabra j
                     if (titlePalabraTf.Value.ContainsKey(palabrasQuery[j]))
-                    { //itemScore +=             tf                         *          idf   
+                    {  //si la palabra j no debe aparecer(pero sí aparece por el if más externo), entonces el doc. no es válido
+                        if(palabrasNoDebenAparecer[j]) 
+                        {
+                            items[i].docValido = false; 
+                            return -1;
+                        } 
+                        //itemScore +=             tf                         *          idf   
                         itemScore += titlePalabraTf.Value[palabrasQuery[j]] * d_PalabraIdf[palabrasQuery[j]];
-                      //si la palabra j no debe aparecer(pero sí aparece por el if más externo), entonces el doc. no es válido
-                        if(palabrasNoDebenAparecer[j]) items[i].docValido = false; 
                     }
                     else  //si el doc. no contiene la palabra j,
                     {     //pero sí debe aparecer, entonces el doc. no es válido
-                        if(palabrasSiDebenAparecer[j]) items[i].docValido = false;
+                        if(palabrasSiDebenAparecer[j]) 
+                        {
+                            items[i].docValido = false;
+                            return -1;
+                        }
                     }
                 }
         return itemScore;
