@@ -1,0 +1,17 @@
+\documentclass{article}
+
+\usepackage[left=2.5cm, right=2.5cm, top=3cm, bottom=3cm]{geometry}
+
+% Para insertar imágenes
+\usepackage{graphicx}
+
+% Para agregar links
+\usepackage{url}
+
+\begin{document}
+\title{\Huge MoogleEngine}
+\author{\Large Noel Hernández Morffi, C113}
+\date{\Large Julio, 2023}
+\maketitle
+
+\end{document}
