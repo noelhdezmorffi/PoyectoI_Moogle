@@ -1,5 +1,0 @@
-\contentsline {section}{\numberline {1}Ejecutando el Proyecto}{3}{}%
-\contentsline {section}{\numberline {2}Funcionalidades básicas}{3}{}%
-\contentsline {section}{\numberline {3}Implementación}{4}{}%
-\contentsline {subsection}{\numberline {3.1}Abstracción de Datos}{4}{}%
-\contentsline {subsection}{\numberline {3.2}Flujo de ejecución}{4}{}%
