@@ -17,48 +17,48 @@ do
    echo "compilando y generando el pdf del informe..."
    cd ..
    cd informe
-   pdflatex InformeLatex
-   pdflatex InformeLatex
+   pdflatex fichero
+   pdflatex fichero
    ;;
    "slides")
    echo "compilando y generando el pdf de la presentación..."
    cd ..
    cd presentación
-   pdflatex PresentaciónLatex
-   pdflatex PresentaciónLatex
+   pdflatex fichero
+   pdflatex fichero
    ;;
    "show_report")
    echo "visualizando el informe..."
    cd ..
    cd informe
-   if test -e InformeLatex.pdf; then
-    xdg-open InformeLatex.pdf
+   if test -e fichero.pdf; then
+    xdg-open fichero.pdf
    else
-    pdflatex InformeLatex
-    pdflatex InformeLatex
-    xdg-open InformeLatex.pdf
+    pdflatex fichero
+    pdflatex fichero
+    xdg-open fichero.pdf
    fi
    ;;
    "show_slides")
    echo "visualizando la presentación..."
    cd ..
    cd presentación
-   if test -e PresentaciónLatex.pdf; then
-    xdg-open PresentaciónLatex.pdf
+   if test -e fichero.pdf; then
+    xdg-open fichero.pdf
    else
-    pdflatex PresentaciónLatex
-    pdflatex PresentaciónLatex
-    xdg-open PresentaciónLatex.pdf
+    pdflatex fichero
+    pdflatex fichero
+    xdg-open fichero.pdf
    fi
    ;;
    "clean")
    echo "eliminados todos los ficheros auxiliares"
    cd ..
    cd informe
-   rm -f InformeLatex.aux InformeLatex.log InformeLatex.toc
+   rm -f fichero.aux fichero.log fichero.toc fichero.pdf
    cd ..
    cd presentación
-   rm -f PresentaciónLatex.aux PresentaciónLatex.log PresentaciónLatex.nav PresentaciónLatex.out PresentaciónLatex.snm PresentaciónLatex.toc
+   rm -f fichero.aux fichero.log fichero.nav fichero.out fichero.snm fichero.toc fichero.pdf
    cd ..
    cd MoogleEngine
    rm -r -f bin obj
