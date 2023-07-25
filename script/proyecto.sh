@@ -59,6 +59,12 @@ do
    cd ..
    cd presentación
    rm -f PresentaciónLatex.aux PresentaciónLatex.log PresentaciónLatex.nav PresentaciónLatex.out PresentaciónLatex.snm PresentaciónLatex.toc
+   cd ..
+   cd MoogleEngine
+   rm -r -f bin obj
+   cd ..
+   cd MoogleServer
+   rm -r -f bin obj
    ;;
    *)
    echo "Opción no válida."
