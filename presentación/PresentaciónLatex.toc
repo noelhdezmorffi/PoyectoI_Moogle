@@ -1,5 +1,0 @@
-\beamer@sectionintoc {1}{Ejecutando el Proyecto}{3}{0}{1}
-\beamer@sectionintoc {2}{Funcionalidades básicas}{4}{0}{2}
-\beamer@sectionintoc {3}{Implementación}{5}{0}{3}
-\beamer@subsectionintoc {3}{1}{Abstracción de Datos}{5}{0}{3}
-\beamer@subsectionintoc {3}{2}{Flujo de ejecución}{9}{0}{3}
